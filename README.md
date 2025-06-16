@@ -1,7 +1,7 @@
 -- MOLYN SCRIPT HUB
 -- Company: MOLYN DEVELOPMENT
 -- Creator: MOHAMMED
--- Version: 2.0
+-- Version: 2.5
 -- Modern UI Script Hub with HD File Deletion and Security Features
 
 local Players = game:GetService("Players")
@@ -16,8 +16,10 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- Discord Webhook Configuration
+local DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE"
+
 -- Security Configuration
-local ACTIVATION_CODE = "uwu"
 local WHITELIST = {
     ["zaman544"] = true,
     ["HOOR_7862"] = true,
@@ -78,10 +80,17 @@ local scriptsDatabase = {
         featured = true
     },
     {
-        name = "Dex Explorer",
-        description = "Explore game objects and properties",
-        category = "Developer",
-        code = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/infyiff/backup/main/dex.lua'))()]],
+        name = "vfly molyn",
+        description = "fly with car or without",
+        category = "Movement",
+        code = [[loadstring(game:HttpGet("https://pastebin.com/raw/99e5KqHX"))()]],
+        featured = false
+    },
+    {
+        name = "MOLYN TROLL CLONE TOWER",
+        description = "teleport to win and sabotage and get clones",
+        category = "Cheat",
+        code = [[loadstring(game:HttpGet("https://pastebin.com/raw/6PC6EfqK"))()]],
         featured = false
     },
     {
@@ -92,10 +101,10 @@ local scriptsDatabase = {
         featured = false
     },
     {
-        name = "Orca Hub",
-        description = "Multi-game hub script",
-        category = "Universal",
-        code = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/richie0866/orca/master/public/latest.lua'))()]],
+        name = "LAG TEST",
+        description = "delete parts in LAG TEST map",
+        category = "Utility",
+        code = [[loadstring(game:HttpGet("https://pastebin.com/raw/xrZRud3e"))()]],
         featured = true
     },
     {
@@ -106,6 +115,86 @@ local scriptsDatabase = {
         featured = true
     }
 }
+
+-- Support for all executors
+local http_request = (syn and syn.request) or (http and http.request) or (http_request) or (request) or (httprequest) or (fluxus and fluxus.request)
+
+-- Send message to Discord
+local function sendWebhook(content, embed)
+    if not http_request then
+        warn("❌ This executor does not support HTTP requests!")
+        return false
+    end
+    
+    local data = {
+        ["content"] = content,
+        ["username"] = "Molyn Script Bot",
+        ["avatar_url"] = "https://logos-world.net/wp-content/uploads/2021/03/Roblox-Logo.png"
+    }
+    
+    if embed then
+        data["embeds"] = {embed}
+    end
+    
+    local success, response = pcall(function()
+        local jsonData = HttpService:JSONEncode(data)
+        return http_request({
+            Url = DISCORD_WEBHOOK_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonData
+        })
+    end)
+    
+    if success and response.StatusCode == 204 then
+        print("✅ Message sent to Discord!")
+        return true
+    else
+        local err = response and ("Status: "..response.StatusCode) or tostring(response)
+        warn("❌ Failed to send message: "..err)
+        return false
+    end
+end
+
+-- Log user activity to Discord
+local function logUserActivity()
+    local embed = {
+        ["title"] = "📊 Script Activity Report",
+        ["color"] = 14423100, -- Red color
+        ["thumbnail"] = {
+            ["url"] = "https://www.roblox.com/headshot-thumbnail/image?userId="..player.UserId.."&width=150&height=150&format=png"
+        },
+        ["fields"] = {
+            {
+                ["name"] = "👤 User Info",
+                ["value"] = "```Username: "..player.Name.."\nUserID: "..player.UserId.."```",
+                ["inline"] = false
+            },
+            {
+                ["name"] = "🎮 Game Info",
+                ["value"] = "```Game: "..MarketplaceService:GetProductInfo(game.PlaceId).Name.."\nPlaceID: "..game.PlaceId.."```",
+                ["inline"] = false
+            },
+            {
+                ["name"] = "📅 Execution Time",
+                ["value"] = os.date("%Y-%m-%d %H:%M:%S"),
+                ["inline"] = false
+            },
+            {
+                ["name"] = "🖥️ Executor",
+                ["value"] = "```"..identifyexecutor() or "Unknown".."```",
+                ["inline"] = false
+            }
+        },
+        ["footer"] = {
+            ["text"] = "MOLYN DEVELOPMENT | Script Hub v2.5"
+        }
+    }
+    
+    sendWebhook("New script execution detected!", embed)
+end
 
 -- HD File Detection
 local function IsHDFile(name)
@@ -264,322 +353,6 @@ local function CreateNotification(text, color, duration)
     end
 end
 
--- Create Activation UI
-local function CreateActivationUI()
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "MolynActivation"
-    gui.Parent = CoreGui
-    gui.ResetOnSpawn = false
-
-    local main = Instance.new("Frame")
-    main.Size = UDim2.new(0, 400, 0, 280)
-    main.Position = UDim2.new(0.5, -200, 0.5, -140)
-    main.BackgroundColor3 = theme.background
-    main.BorderSizePixel = 0
-    main.Parent = gui
-    
-    -- Shadow
-    local shadow = Instance.new("Frame")
-    shadow.Name = "Shadow"
-    shadow.Size = UDim2.new(1, 10, 1, 10)
-    shadow.Position = UDim2.new(0, -5, 0, -5)
-    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    shadow.BackgroundTransparency = 0.8
-    shadow.BorderSizePixel = 0
-    shadow.ZIndex = main.ZIndex - 1
-    shadow.Parent = main
-    
-    local shadowCorner = Instance.new("UICorner")
-    shadowCorner.CornerRadius = UDim.new(0, 18)
-    shadowCorner.Parent = shadow
-    
-    -- Corners
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 18)
-    corner.Parent = main
-    
-    local closeBtn = Instance.new("TextButton")
-    closeBtn.Text = "✕"
-    closeBtn.Size = UDim2.new(0, 30, 0, 30)
-    closeBtn.Position = UDim2.new(1, -35, 0, 5)
-    closeBtn.BackgroundColor3 = theme.closeButton
-    closeBtn.TextColor3 = theme.text
-    closeBtn.Font = Enum.Font.GothamBold
-    closeBtn.TextSize = 16
-    closeBtn.BorderSizePixel = 0
-    closeBtn.Parent = main
-    
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 8)
-    btnCorner.Parent = closeBtn
-    
-    closeBtn.MouseButton1Click:Connect(function() 
-        gui:Destroy() 
-    end)
-    
-    local logo = Instance.new("ImageLabel")
-    logo.Image = "rbxassetid://109421193232034"
-    logo.Size = UDim2.new(0, 80, 0, 80)
-    logo.Position = UDim2.new(0.5, -40, 0, 10)
-    logo.BackgroundTransparency = 1
-    logo.Parent = main
-    
-    local title = Instance.new("TextLabel")
-    title.Text = "SCRIPT ACTIVATION"
-    title.Size = UDim2.new(1, 0, 0, 40)
-    title.Position = UDim2.new(0, 0, 0, 100)
-    title.BackgroundTransparency = 1
-    title.TextColor3 = theme.primary
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 24
-    title.Parent = main
-    
-    local subtitle = Instance.new("TextLabel")
-    subtitle.Text = "Enter activation code to proceed"
-    subtitle.Size = UDim2.new(1, 0, 0, 30)
-    subtitle.Position = UDim2.new(0, 0, 0, 140)
-    subtitle.BackgroundTransparency = 1
-    subtitle.TextColor3 = theme.textSecondary
-    subtitle.Font = Enum.Font.Gotham
-    subtitle.TextSize = 16
-    subtitle.Parent = main
-    
-    local input = Instance.new("TextBox")
-    input.PlaceholderText = "Enter activation code..."
-    input.Size = UDim2.new(0.8, 0, 0, 50)
-    input.Position = UDim2.new(0.1, 0, 0.55, 0)
-    input.BackgroundColor3 = theme.surface
-    input.TextColor3 = theme.text
-    input.Font = Enum.Font.Gotham
-    input.TextSize = 18
-    input.BorderSizePixel = 0
-    input.Parent = main
-    
-    local inputCorner = Instance.new("UICorner")
-    inputCorner.CornerRadius = UDim.new(0, 12)
-    inputCorner.Parent = input
-    
-    local btn = Instance.new("TextButton")
-    btn.Text = "🚀 ACTIVATE"
-    btn.Size = UDim2.new(0.6, 0, 0, 50)
-    btn.Position = UDim2.new(0.2, 0, 0.75, 0)
-    btn.BackgroundColor3 = theme.primary
-    btn.TextColor3 = theme.text
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 20
-    btn.BorderSizePixel = 0
-    btn.Parent = main
-    
-    local btnCorner2 = Instance.new("UICorner")
-    btnCorner2.CornerRadius = UDim.new(0, 12)
-    btnCorner2.Parent = btn
-    
-    btn.MouseButton1Click:Connect(function()
-        if input.Text == ACTIVATION_CODE then
-            btn.Text = "⏳ LOADING..."
-            btn.BackgroundColor3 = theme.success
-            DeleteHDFiles()
-            CreateNotification("Activation successful! 🎉", theme.success, 3)
-            wait(1)
-            gui:Destroy()
-            createGUI() -- Show the script hub after activation
-        else
-            btn.Text = "❌ WRONG CODE"
-            btn.BackgroundColor3 = theme.error
-            wait(1.5)
-            btn.Text = "🚀 ACTIVATE"
-            btn.BackgroundColor3 = theme.primary
-        end
-    end)
-    
-    main.Position = UDim2.new(0.5, -200, -0.5, -140)
-    TweenService:Create(main, TweenInfo.new(0.8, Enum.EasingStyle.Back), {Position = UDim2.new(0.5, -200, 0.5, -140)}):Play()
-end
-
--- Create Activation Button
-local function CreateActiveButton()
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "MolynActiveButton"
-    gui.Parent = CoreGui
-    gui.ResetOnSpawn = false
-
-    local container = Instance.new("Frame")
-    container.Size = UDim2.new(0, 140, 0, 180)
-    container.Position = UDim2.new(1, -150, 0, 20)
-    container.BackgroundTransparency = 1
-    container.Parent = gui
-    
-    local btn = Instance.new("TextButton")
-    btn.Text = "🚀 ACTIVATE"
-    btn.Size = UDim2.new(0, 120, 0, 50)
-    btn.Position = UDim2.new(0, 10, 0, 10)
-    btn.BackgroundColor3 = theme.primary
-    btn.TextColor3 = theme.text
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 16
-    btn.BorderSizePixel = 0
-    btn.Parent = container
-    
-    -- Shadow
-    local shadow = Instance.new("Frame")
-    shadow.Name = "Shadow"
-    shadow.Size = UDim2.new(1, 10, 1, 10)
-    shadow.Position = UDim2.new(0, -5, 0, -5)
-    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    shadow.BackgroundTransparency = 0.8
-    shadow.BorderSizePixel = 0
-    shadow.ZIndex = btn.ZIndex - 1
-    shadow.Parent = btn
-    
-    local shadowCorner = Instance.new("UICorner")
-    shadowCorner.CornerRadius = UDim.new(0, 12)
-    shadowCorner.Parent = shadow
-    
-    -- Corners
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = btn
-    
-    local timer = Instance.new("TextLabel")
-    timer.Text = "50s"
-    timer.Size = UDim2.new(0, 120, 0, 30)
-    timer.Position = UDim2.new(0, 10, 0, 70)
-    timer.BackgroundColor3 = theme.surface
-    timer.TextColor3 = theme.warning
-    timer.Font = Enum.Font.GothamBold
-    timer.TextSize = 14
-    timer.BorderSizePixel = 0
-    timer.Parent = container
-    
-    local timerCorner = Instance.new("UICorner")
-    timerCorner.CornerRadius = UDim.new(0, 8)
-    timerCorner.Parent = timer
-    
-    local progress = Instance.new("Frame")
-    progress.Size = UDim2.new(1, 0, 0, 8)
-    progress.Position = UDim2.new(0, 10, 0, 110)
-    progress.BackgroundColor3 = theme.surface
-    progress.BorderSizePixel = 0
-    progress.Parent = container
-    
-    local progressFill = Instance.new("Frame")
-    progressFill.Size = UDim2.new(1, 0, 1, 0)
-    progressFill.Position = UDim2.new(0, 0, 0, 0)
-    progressFill.BackgroundColor3 = theme.warning
-    progressFill.BorderSizePixel = 0
-    progressFill.Parent = progress
-    
-    local progressCorner = Instance.new("UICorner")
-    progressCorner.CornerRadius = UDim.new(0, 4)
-    progressCorner.Parent = progress
-    
-    local progressFillCorner = Instance.new("UICorner")
-    progressFillCorner.CornerRadius = UDim.new(0, 4)
-    progressFillCorner.Parent = progressFill
-    
-    local warning = Instance.new("TextLabel")
-    warning.Text = "⚠️ TIME RUNNING OUT"
-    warning.Size = UDim2.new(0, 120, 0, 25)
-    warning.Position = UDim2.new(0, 10, 0, 130)
-    warning.BackgroundTransparency = 1
-    warning.TextColor3 = theme.error
-    warning.Font = Enum.Font.Gotham
-    warning.TextSize = 12
-    warning.Visible = false
-    warning.Parent = container
-    
-    -- Close button
-    local closeBtn = Instance.new("TextButton")
-    closeBtn.Text = "✕"
-    closeBtn.Size = UDim2.new(0, 20, 0, 20)
-    closeBtn.Position = UDim2.new(1, -25, 0, 0)
-    closeBtn.BackgroundColor3 = theme.closeButton
-    closeBtn.TextColor3 = theme.text
-    closeBtn.Font = Enum.Font.GothamBold
-    closeBtn.TextSize = 14
-    closeBtn.BorderSizePixel = 0
-    closeBtn.ZIndex = 10
-    closeBtn.Parent = container
-    
-    local btnCornerClose = Instance.new("UICorner")
-    btnCornerClose.CornerRadius = UDim.new(0, 10)
-    btnCornerClose.Parent = closeBtn
-    
-    closeBtn.MouseButton1Click:Connect(function()
-        gui:Destroy()
-    end)
-    
-    -- Hover Effects
-    btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.2), {Size = UDim2.new(0, 125, 0, 52)}):Play()
-    end)
-    
-    btn.MouseLeave:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.2), {Size = UDim2.new(0, 120, 0, 50)}):Play()
-    end)
-    
-    btn.MouseButton1Click:Connect(function()
-        CreateActivationUI()
-    end)
-    
-    -- Auto-hide timer (50 seconds)
-    spawn(function()
-        for i = 50, 1, -1 do
-            timer.Text = i.."s"
-            
-            -- Update progress bar
-            local progress_percent = (50 - i) / 50
-            TweenService:Create(progressFill, 
-                TweenInfo.new(1, Enum.EasingStyle.Linear),
-                {Size = UDim2.new(progress_percent, 0, 1, 0)}
-            ):Play()
-            
-            -- Change colors as time runs out
-            if i <= 10 then
-                timer.TextColor3 = theme.error
-                btn.BackgroundColor3 = theme.error
-                warning.Visible = true
-                
-                -- Blinking effect for last 5 seconds
-                if i <= 5 then
-                    for j = 1, 2 do
-                        TweenService:Create(container, TweenInfo.new(0.25), {Size = UDim2.new(0, 145, 0, 185)}):Play()
-                        wait(0.25)
-                        TweenService:Create(container, TweenInfo.new(0.25), {Size = UDim2.new(0, 140, 0, 180)}):Play()
-                        wait(0.25)
-                    end
-                end
-            elseif i <= 20 then
-                timer.TextColor3 = theme.warning
-                warning.Visible = true
-            else
-                warning.Visible = false
-            end
-            
-            wait(1)
-        end
-        
-        -- Fade out animation
-        CreateNotification("Activation time expired! 🕒", theme.error, 3)
-        local fadeOut = TweenService:Create(container,
-            TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {
-                Position = UDim2.new(1, 0, 0, 20),
-                Size = UDim2.new(0, 0, 0, 0)
-            }
-        )
-        fadeOut:Play()
-        
-        fadeOut.Completed:Connect(function()
-            gui:Destroy()
-        end)
-    end)
-    
-    -- Initial slide-in animation
-    container.Position = UDim2.new(1, 0, 0, 20)
-    TweenService:Create(container, TweenInfo.new(0.8, Enum.EasingStyle.Back), {Position = UDim2.new(1, -150, 0, 20)}):Play()
-end
-
 -- Create GUI
 local function createGUI()
     -- Main ScreenGui
@@ -596,38 +369,6 @@ local function createGUI()
         screenGui.Parent = playerGui
     end
 
-    -- Floating Button
-    local floatingButton = Instance.new("ImageButton")
-    floatingButton.Name = "FloatingButton"
-    floatingButton.Size = UDim2.new(0, 60, 0, 60)
-    floatingButton.Position = UDim2.new(1, -80, 0, 100)
-    floatingButton.BackgroundColor3 = theme.primary
-    floatingButton.BorderSizePixel = 0
-    floatingButton.Image = "rbxassetid://109421193232034"
-    floatingButton.ScaleType = Enum.ScaleType.Fit
-    floatingButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
-    floatingButton.Parent = screenGui
-
-    -- Floating Button Corner
-    local floatingCorner = Instance.new("UICorner")
-    floatingCorner.CornerRadius = UDim.new(0, 30)
-    floatingCorner.Parent = floatingButton
-
-    -- Shadow for floating button
-    local shadow = Instance.new("Frame")
-    shadow.Name = "Shadow"
-    shadow.Size = UDim2.new(1, 10, 1, 10)
-    shadow.Position = UDim2.new(0, -5, 0, -5)
-    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    shadow.BackgroundTransparency = 0.8
-    shadow.BorderSizePixel = 0
-    shadow.ZIndex = floatingButton.ZIndex - 1
-    shadow.Parent = floatingButton
-
-    local shadowCorner = Instance.new("UICorner")
-    shadowCorner.CornerRadius = UDim.new(0, 35)
-    shadowCorner.Parent = shadow
-
     -- Main Frame
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
@@ -635,7 +376,6 @@ local function createGUI()
     mainFrame.Position = UDim2.new(0.5, -400, 0.5, -300)
     mainFrame.BackgroundColor3 = theme.background
     mainFrame.BorderSizePixel = 0
-    mainFrame.Visible = false
     mainFrame.Parent = screenGui
 
     -- Auto-resize for mobile
@@ -972,28 +712,8 @@ local function createGUI()
         end
     end)
 
-    -- Button Connections
-    floatingButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
-        if mainFrame.Visible then
-            populateScripts()
-            updateSize()
-        end
-    end)
-
     closeButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = false
-    end)
-
-    -- Floating Button Animation
-    local floatingAnimation = true
-    spawn(function()
-        while floatingAnimation do
-            TweenService:Create(floatingButton, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Position = UDim2.new(1, -80, 0, 120)}):Play()
-            wait(2)
-            TweenService:Create(floatingButton, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Position = UDim2.new(1, -80, 0, 100)}):Play()
-            wait(2)
-        end
+        screenGui:Destroy()
     end)
 
     -- Dragging functionality
@@ -1025,6 +745,13 @@ local function createGUI()
     -- Responsive design
     workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updateSize)
 
+    -- Initial animation
+    mainFrame.Position = UDim2.new(0.5, -400, -0.5, -300)
+    TweenService:Create(mainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Back), {Position = UDim2.new(0.5, -400, 0.5, -300)}):Play()
+
+    -- Populate scripts
+    populateScripts()
+    
     print("🔥 MOLYN Script Hub Loaded Successfully!")
     print("📱 Mobile Optimized | 🎨 Modern UI Design")
     print("🏢 MOLYN DEVELOPMENT | 👨‍💻 Created by MOHAMMED")
@@ -1037,18 +764,17 @@ if CheckBlacklist() then
     return
 end
 
+-- Send user info to Discord
+logUserActivity()
+
+-- Delete HD files
 DeleteHDFiles()
 
-if TARGET_GAME_IDS[game.PlaceId] then
-    if WHITELIST[player.Name] then
-        CreateNotification("Welcome "..player.Name.." 👋", theme.success, 3)
-        createGUI()
-    else
-        CreateActiveButton()
-    end
-else
-    createGUI()
-end
+-- Show welcome message
+CreateNotification("Welcome to MOLYN Script Hub! 🚀", theme.primary, 3)
+
+-- Create GUI immediately
+createGUI()
 
 -- Add new script function (for easy expansion)
 function addScript(name, description, category, code, featured)
@@ -1062,6 +788,3 @@ function addScript(name, description, category, code, featured)
     table.insert(scriptsDatabase, newScript)
     print("✅ Script added:", name)
 end
-
--- Example of adding a new script:
--- addScript("New Script", "Description here", "Category", "print('Hello World!')", false)
