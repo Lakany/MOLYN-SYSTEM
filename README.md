@@ -1,34 +1,27 @@
--- Script Loader - Protection Layer
--- This script loads and executes remote code without exposing it directly
+--[[
+  Roblox Script Loader
+  بواسطة Lakany
+  يقوم بتحميل وتنفيذ سكربت من رابط مباشر
+--]]
 
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
+local ScriptURL = "https://raw.githubusercontent.com/Lakany/MOLYN-SPAMMER1/refs/heads/main/README.md"
 
--- Configuration
-local SCRIPT_URL = "https://raw.githubusercontent.com/Lakany/MOLYN-SPAMMER1/refs/heads/main/README.md"
-local player = Players.LocalPlayer
-
--- Function to load and execute remote script
-local function loadRemoteScript()
-    local success, response = pcall(function()
-        return HttpService:GetAsync(SCRIPT_URL)
+-- وظيفة لتحميل وتنفيذ السكربت
+local function LoadScript()
+    print("جاري تحميل السكربت...")
+    
+    local Success, Error = pcall(function()
+        local ScriptContent = game:HttpGet(ScriptURL, true)
+        local LoadedScript = loadstring(ScriptContent)
+        LoadedScript()
     end)
     
-    if success and response then
-        -- Execute the loaded script
-        local executeSuccess, executeError = pcall(function()
-            loadstring(response)()
-        end)
-        
-        if not executeSuccess then
-            warn("Script execution failed: " .. tostring(executeError))
-        end
+    if not Success then
+        warn("فشل تحميل السكربت: " .. Error)
     else
-        warn("Failed to load remote script")
+        print("تم تشغيل السكربت بنجاح!")
     end
 end
 
--- Execute the loader
-spawn(function()
-    loadRemoteScript()
-end)
+-- تشغيل الوظيفة
+LoadScript()
