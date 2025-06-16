@@ -17,7 +17,7 @@ local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- Security Configuration
-local ACTIVATION_CODE = "free"
+local ACTIVATION_CODE = "uwu"
 local WHITELIST = {
     ["zaman544"] = true,
     ["HOOR_7862"] = true,
@@ -78,17 +78,10 @@ local scriptsDatabase = {
         featured = true
     },
     {
-        name = "vfly molyn",
-        description = "fly with car or without (in maintenance)",
-        category = "Movement",
-        code = [[loadstring(game:HttpGet("https://pastebin.com/raw/99e5KqHXV2"))()'))()]],
-        featured = false
-    },
-    {
-        name = "MOLYN TROLL CLONE TOWER",
-        description = "teleport to win and sabotage and get clones",
-        category = "cheat",
-        code = [[loadstring(game:HttpGet("https://pastebin.com/raw/6PC6EfqK"))()'))()]],
+        name = "Dex Explorer",
+        description = "Explore game objects and properties",
+        category = "Developer",
+        code = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/infyiff/backup/main/dex.lua'))()]],
         featured = false
     },
     {
@@ -99,10 +92,10 @@ local scriptsDatabase = {
         featured = false
     },
     {
-        name = "LAG TEST",
-        description = "delete parts in LAG TEST map",
-        category = "delete",
-        code = [[loadstring(game:HttpGet("https://pastebin.com/raw/xrZRud3e"))()'))()]],
+        name = "Orca Hub",
+        description = "Multi-game hub script",
+        category = "Universal",
+        code = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/richie0866/orca/master/public/latest.lua'))()]],
         featured = true
     },
     {
